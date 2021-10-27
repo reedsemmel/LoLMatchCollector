@@ -53,6 +53,7 @@ type LeagueEntryDto struct {
 type MatchDto struct {
 	Metadata MetadataDto `json:"metadata"`
 	Info     InfoDto     `json:"info"`
+	MatchId  string      `json:"_id"` // Set the default key to be the match id
 }
 
 type MetadataDto struct {
