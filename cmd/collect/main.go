@@ -139,13 +139,14 @@ func main() {
 	mongoUrl := os.Getenv("MONGODB_ADDR")
 	user := os.Getenv("MONGODB_USER")
 	password := os.Getenv("MONGODB_PASS")
+	collection_name := os.Getenv("MONGODB_COLLECTION")
 
-	if len(apiKey) == 0 || len(mongoUrl) == 0 || len(user) == 0 || len(password) == 0 {
+	if len(apiKey) == 0 || len(mongoUrl) == 0 || len(user) == 0 || len(password) == 0 || len(collection_name) == 0 {
 		log.Fatal("not all needed environment variables are set")
 	}
 
 	mongoOpts := options.Client().ApplyURI(mongoUrl)
-	mongoOpts.SetAppName("LolMatchCollector_")
+	mongoOpts.SetAppName("LolMatchCollector")
 	mongoOpts.SetAuth(options.Credential{
 		AuthMechanism: "SCRAM-SHA-256",
 		AuthSource:    "admin",
@@ -153,16 +154,12 @@ func main() {
 		Password:      password,
 	})
 
-	if apiKey == "" {
-		log.Fatalln("No $RGAPIKEY found")
-	}
-
 	mongoClient, err := mongo.Connect(context.Background(), mongoOpts)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	coll = mongoClient.Database("admin").Collection("matches")
+	coll = mongoClient.Database("admin").Collection(collection_name)
 
 	if coll == nil {
 		log.Fatal("could not find collection")
