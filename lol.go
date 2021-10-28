@@ -59,7 +59,7 @@ func (c *ApiClient) request(server, endpoint string) (*http.Response, error) {
 		switch res.StatusCode {
 		case 200, 404:
 			return res, err
-		case 400, 401, 403, 500, 502, 503, 504:
+		case 400, 401, 403:
 			log.Fatalln(res.Status, server+endpoint)
 		case 429:
 			res.Body.Close()
@@ -77,18 +77,25 @@ func (c *ApiClient) request(server, endpoint string) (*http.Response, error) {
 
 			log.Println("Received a 429, waiting", retry_after, "seconds")
 			time.Sleep(time.Duration(retry_after) * time.Second)
+		case 500, 502, 503, 504:
+			res.Body.Close()
+			if i == 3 {
+				break
+			}
+			log.Println("Received", res.Status, ", waiting 5 minutes")
+			time.Sleep(5 * time.Minute)
 		default:
 			log.Fatalln("Received unexpected status code", res.Status)
 		}
 	}
-	log.Fatalln("too many 429s on", server+endpoint)
+	log.Fatalln("too many 429s or 5xxs on", server+endpoint)
 	return nil, nil
 }
 
 func (c *ApiClient) GetLeagueEntries(r Rank, d Division, page int) ([]LeagueEntryDto, error) {
 	// Make the endpoint string
 	if page < 1 {
-		return nil, errors.New("page number cannot be than 1")
+		return nil, errors.New("page number cannot be less than 1")
 	}
 
 	if (r == RankChall || r == RankGM || r == RankM) && d != Div1 {
@@ -203,6 +210,6 @@ func (c *ApiClient) GetMatch(match_id string) (MatchDto, error) {
 		return MatchDto{}, err
 	}
 
+	match.MatchId = match_id
 	return match, nil
-
 }

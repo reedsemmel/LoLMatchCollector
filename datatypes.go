@@ -17,7 +17,9 @@ const (
 	RankS
 	RankB
 	RankI
+)
 
+const (
 	Div1 Division = iota
 	Div2
 	Div3
@@ -53,7 +55,7 @@ type LeagueEntryDto struct {
 type MatchDto struct {
 	Metadata MetadataDto `json:"metadata"`
 	Info     InfoDto     `json:"info"`
-	MatchId  string      `json:"_id"` // Set the default key to be the match id
+	MatchId  string      `json:"matchId"`
 }
 
 type MetadataDto struct {
