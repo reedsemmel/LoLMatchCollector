@@ -323,9 +323,9 @@ def demo():
     import sqlite3
     conn = sqlite3.connect('matches.sqlite3')
     cur = conn.cursor()
-    for row in cur.execute("SELECT summonerName, championName, patch, mythicItem FROM matches WHERE summonerName = 'ItsMeatGod'"):
+    for row in cur.execute("SELECT summonerName, win, kills, deaths, assists, mythicItem, championName FROM matches WHERE (summonerName = 'Doublelift')"):
         r = tuple(row)
-        print(r[0], "played", r[1], "on patch", r[2], "and bought", item_id_name[r[3]])
+        print(f"{r[0]} {'won' if r[1] == 'true' else 'lost'} on {r[6]} with KDA {r[2]}/{r[3]}/{r[4]} and built {item_id_name[r[5]]}")
 
     conn.close()
 
